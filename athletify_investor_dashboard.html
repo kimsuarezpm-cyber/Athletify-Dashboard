@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Athletify · Investor Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --border: #e8e6e0;
+    --border-strong: #d0cdc6;
+    --text: #1a1a18;
+    --text-muted: #6b6b65;
+    --text-light: #9b9b93;
+    --blue-bg: #e8f1fb;
+    --blue-border: #b5d0f0;
+    --blue-text: #1a4f8a;
+    --blue-mid: #3a7bd5;
+    --green-bg: #e8f5ee;
+    --green-border: #a8d9b8;
+    --green-text: #1a5c34;
+    --green-mid: #2e9e5a;
+    --purple-bg: #eeecfc;
+    --purple-border: #c5bff5;
+    --purple-text: #3a2e9a;
+    --purple-mid: #6b5ce7;
+    --amber-bg: #fdf3e3;
+    --amber-border: #f5d495;
+    --amber-text: #7a4d10;
+    --amber-mid: #e8a020;
+    --coral-bg: #fdf0ed;
+    --coral-border: #f5bfb0;
+    --coral-text: #8a2e1a;
+    --teal-bg: #e3f5f0;
+    --teal-border: #95d9c8;
+    --teal-text: #0d5c48;
+    --teal-mid: #1a9e7a;
+    --accent: #1a4f8a;
+    --accent-green: #2e9e5a;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
+  .logo span { color: var(--blue-mid); }
+  .logo-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+  .pre-seed {
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    border-radius: 10px;
+    padding: 8px 16px;
+    text-align: right;
+  }
+  .pre-seed-label { font-size: 10px; color: var(--green-text); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+  .pre-seed-val { font-size: 16px; font-weight: 600; color: var(--green-text); }
+
+  /* NAV */
+  .nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .nav-btn {
+    padding: 14px 20px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.active { color: var(--blue-mid); border-bottom-color: var(--blue-mid); font-weight: 500; }
+
+  /* CONTENT */
+  .content { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* INSIGHT BOX */
+  .insight {
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .insight.blue { background: var(--blue-bg); border-color: var(--blue-border); color: var(--blue-text); }
+  .insight.green { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
+  .insight.amber { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber-text); }
+
+  /* KPI ROW */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .kpi-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 500; }
+  .kpi-val { font-size: 24px; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+  .kpi-sub { font-size: 11px; color: var(--text-muted); }
+  .kpi-val.blue { color: var(--blue-mid); }
+  .kpi-val.green { color: var(--green-mid); }
+  .kpi-val.amber { color: var(--amber-mid); }
+  .kpi-val.coral { color: #c0392b; }
+  .kpi-val.purple { color: var(--purple-mid); }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .card-source { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+
+  /* TAM SAM SOM BOXES */
+  .tsm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .tsm-box { border-radius: 14px; padding: 18px; border: 1px solid; }
+  .tsm-box.tam { background: var(--blue-bg); border-color: var(--blue-border); }
+  .tsm-box.sam { background: var(--green-bg); border-color: var(--green-border); }
+  .tsm-box.som { background: var(--purple-bg); border-color: var(--purple-border); }
+  .tsm-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+  .tam .tsm-label { color: var(--blue-text); }
+  .sam .tsm-label { color: var(--green-text); }
+  .som .tsm-label { color: var(--purple-text); }
+  .tsm-val { font-size: 30px; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+  .tam .tsm-val { color: var(--blue-text); }
+  .sam .tsm-val { color: var(--green-text); }
+  .som .tsm-val { color: var(--purple-text); }
+  .tsm-name { font-size: 11px; margin-bottom: 8px; }
+  .tam .tsm-name { color: var(--blue-mid); }
+  .sam .tsm-name { color: var(--green-mid); }
+  .som .tsm-name { color: var(--purple-mid); }
+  .tsm-desc { font-size: 11px; line-height: 1.5; }
+  .tam .tsm-desc { color: var(--blue-text); }
+  .sam .tsm-desc { color: var(--green-text); }
+  .som .tsm-desc { color: var(--purple-text); }
+  .tsm-cagr {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-top: 8px;
+  }
+  .tam .tsm-cagr { background: var(--blue-border); color: var(--blue-text); }
+  .sam .tsm-cagr { background: var(--green-border); color: var(--green-text); }
+  .som .tsm-cagr { background: var(--purple-border); color: var(--purple-text); }
+
+  /* BAR CHARTS */
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .bar-label { font-size: 11px; color: var(--text-muted); min-width: 120px; }
+  .bar-label.sm { min-width: 85px; }
+  .bar-track { flex: 1; background: #f0ede8; border-radius: 4px; height: 18px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 600; transition: width 0.8s ease; }
+  .bf-blue { background: #b5d0f0; color: var(--blue-text); }
+  .bf-green { background: #a8d9b8; color: var(--green-text); }
+  .bf-teal { background: var(--teal-border); color: var(--teal-text); }
+  .bf-amber { background: var(--amber-border); color: var(--amber-text); }
+  .bf-coral { background: var(--coral-border); color: var(--coral-text); }
+  .bf-purple { background: var(--purple-border); color: var(--purple-text); }
+  .bf-gray { background: #d3d1c7; color: #444; }
+
+  /* ECO CARDS */
+  .eco-card { border-radius: 14px; padding: 18px; border: 1px solid; text-align: center; }
+  .eco-card.spon { background: var(--blue-bg); border-color: var(--blue-border); }
+  .eco-card.fan { background: var(--green-bg); border-color: var(--green-border); }
+  .eco-card.tech { background: var(--purple-bg); border-color: var(--purple-border); }
+  .eco-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .spon .eco-label { color: var(--blue-text); }
+  .fan .eco-label { color: var(--green-text); }
+  .tech .eco-label { color: var(--purple-text); }
+  .eco-val { font-size: 28px; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+  .spon .eco-val { color: var(--blue-text); }
+  .fan .eco-val { color: var(--green-text); }
+  .tech .eco-val { color: var(--purple-text); }
+  .eco-proj { font-size: 11px; margin-bottom: 6px; }
+  .spon .eco-proj { color: var(--blue-mid); }
+  .fan .eco-proj { color: var(--green-mid); }
+  .tech .eco-proj { color: var(--purple-mid); }
+  .eco-cagr { display: inline-block; font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 20px; }
+  .spon .eco-cagr { background: var(--blue-border); color: var(--blue-text); }
+  .fan .eco-cagr { background: var(--green-border); color: var(--green-text); }
+  .tech .eco-cagr { background: var(--purple-border); color: var(--purple-text); }
+
+  /* HEATMAP */
+  .ht { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .ht th { padding: 7px 8px; color: var(--text-muted); font-weight: 500; text-align: center; border-bottom: 1px solid var(--border); }
+  .ht td { padding: 7px 8px; text-align: center; border-bottom: 1px solid var(--border); }
+  .ht td:first-child { text-align: left; font-weight: 500; }
+  .hh { background: var(--teal-border); color: var(--teal-text); border-radius: 4px; padding: 2px 6px; display: inline-block; font-weight: 600; }
+  .hm { background: var(--amber-border); color: var(--amber-text); border-radius: 4px; padding: 2px 6px; display: inline-block; }
+
+  /* AGE BARS */
+  .age-group { margin-bottom: 16px; }
+  .age-name { font-size: 12px; font-weight: 500; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .age-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+  .age-lbl { font-size: 10px; color: var(--text-muted); min-width: 40px; }
+  .age-track { flex: 1; background: #f0ede8; border-radius: 3px; height: 14px; overflow: hidden; }
+  .age-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 5px; font-size: 9px; font-weight: 600; }
+  .af1 { background: #b5d0f0; color: var(--blue-text); }
+  .af2 { background: var(--teal-border); color: var(--teal-text); }
+  .af3 { background: var(--amber-border); color: var(--amber-text); }
+  .af4 { background: #d3d1c7; color: #444; }
+
+  /* TAG */
+  .tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+  .tg-blue { background: var(--blue-bg); color: var(--blue-text); border: 1px solid var(--blue-border); }
+  .tg-green { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+  .tg-amber { background: var(--amber-bg); color: var(--amber-text); border: 1px solid var(--amber-border); }
+
+  /* RANK */
+  .rank { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+  .r1 { background: var(--amber-border); color: var(--amber-text); }
+  .r2 { background: var(--blue-bg); color: var(--blue-text); border: 1px solid var(--blue-border); }
+  .r3 { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+  .rn { background: #f0ede8; color: var(--text-muted); }
+
+  /* WHY NOW */
+  .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .why-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .why-num { font-size: 26px; font-weight: 600; margin-bottom: 2px; }
+  .why-title { font-size: 12px; font-weight: 500; margin-bottom: 6px; }
+  .why-body { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+  /* TRACTION */
+  .tr-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .tr-row:last-child { border-bottom: none; }
+  .tr-val { font-size: 15px; font-weight: 600; min-width: 90px; flex-shrink: 0; }
+  .tr-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+  /* LAYERS */
+  .layer { display: flex; border-radius: 12px; overflow: hidden; margin-bottom: 6px; }
+  .ll { font-size: 10px; font-weight: 500; min-width: 160px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px; flex-shrink: 0; }
+  .ll .lsub { font-size: 9px; opacity: 0.7; }
+  .lb { flex: 1; padding: 10px 12px; }
+  .lv { font-size: 12px; font-weight: 600; }
+  .ld { font-size: 10px; margin-top: 2px; opacity: 0.8; }
+  .l1 .ll { background: var(--blue-border); color: var(--blue-text); }
+  .l1 .lb { background: var(--blue-bg); color: var(--blue-text); }
+  .l2 .ll { background: var(--green-border); color: var(--green-text); }
+  .l2 .lb { background: var(--green-bg); color: var(--green-text); }
+  .l3 .ll { background: var(--purple-border); color: var(--purple-text); }
+  .l3 .lb { background: var(--purple-bg); color: var(--purple-text); }
+  .l4 .ll { background: var(--amber-border); color: var(--amber-text); }
+  .l4 .lb { background: var(--amber-bg); color: var(--amber-text); }
+
+  .fnote { font-size: 10px; color: var(--text-muted); margin-top: 6px; line-height: 1.4; padding-top: 8px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">Athle<span>tify</span> · Investor Dashboard</div>
+    <div class="logo-sub">AWÁ Sports Tech · Pre-Seed Round · Datos verificados · Abril 2026</div>
+  </div>
+  <div class="pre-seed">
+    <div class="pre-seed-label">Pre-Seed Round</div>
+    <div class="pre-seed-val">$600K · $300K committed</div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showPage('eco', this)">🌍 Ecosistema</button>
+  <button class="nav-btn" onclick="showPage('tam', this)">📊 TAM · SAM · SOM</button>
+  <button class="nav-btn" onclick="showPage('atletas', this)">🏅 Athlete Data</button>
+  <button class="nav-btn" onclick="showPage('why', this)">⚡ Why Now</button>
+  <button class="nav-btn" onclick="showPage('traction', this)">🏆 Tracción</button>
+  <button class="nav-btn" onclick="showPage('roadmap', this)">🗺 Roadmap</button>
+</div>
+
+<div class="content">
+
+<!-- ECOSISTEMA -->
+<div class="page active" id="page-eco">
+  <div class="insight blue"><strong>Contexto macro:</strong> Athletify opera dentro de una industria deportiva global de $2.5T+. Tres mercados clave como ecosistema de oportunidad — los mismos que el deck de tu jefe, con datos actualizados a 2025.</div>
+  <div class="grid-3">
+    <div class="eco-card spon">
+      <div class="eco-label">Sports Sponsorship</div>
+      <div class="eco-val">$91.7B</div>
+      <div class="eco-proj">→ $156B en 2034</div>
+      <span class="eco-cagr">CAGR 8% · Fortune BI 2025</span>
+    </div>
+    <div class="eco-card fan">
+      <div class="eco-label">Fantasy Sports Market</div>
+      <div class="eco-val">$27.8B</div>
+      <div class="eco-proj">→ $56.4B en 2030</div>
+      <span class="eco-cagr">CAGR 15.2% · Grand View 2025</span>
+    </div>
+    <div class="eco-card tech">
+      <div class="eco-label">Sports Technology</div>
+      <div class="eco-val">$34.3B</div>
+      <div class="eco-proj">→ $68.7B en 2030</div>
+      <span class="eco-cagr">CAGR 14.9% · MnM 2025</span>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Sponsorship por liga 2025</div>
+      <div class="card-source">Ampere · Sports Value · Abril 2026</div>
+      <div class="bar-row"><div class="bar-label sm">F1 🏎</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:100%">$3.1B · #1 global</div></div></div>
+      <div class="bar-row"><div class="bar-label sm">NFL 🏈</div><div class="bar-track"><div class="bar-fill bf-teal" style="width:81%">$2.5B</div></div></div>
+      <div class="bar-row"><div class="bar-label sm">Premier League ⚽</div><div class="bar-track"><div class="bar-fill bf-teal" style="width:81%">$2.5B</div></div></div>
+      <div class="bar-row"><div class="bar-label sm">Bundesliga ⚽</div><div class="bar-track"><div class="bar-fill bf-amber" style="width:65%">$2.0B</div></div></div>
+      <div class="bar-row"><div class="bar-label sm">NBA 🏀</div><div class="bar-track"><div class="bar-fill bf-coral" style="width:52%">$1.6B</div></div></div>
+      <div class="bar-row"><div class="bar-label sm">LaLiga ⚽</div><div class="bar-track"><div class="bar-fill bf-gray" style="width:42%">$1.3B</div></div></div>
+      <div class="fnote">Tech sector = inversor #1 en F1 ($543M). Oportunidad Athletify: conectar atletas con sponsors usando data verificada.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Fantasy Sports — validación de demanda</div>
+      <div class="card-source">Grand View Research · IMARC 2025</div>
+      <div class="bar-row"><div class="bar-label sm">Global 2025</div><div class="bar-track"><div class="bar-fill bf-green" style="width:100%">$27.8B</div></div></div>
+      <div class="bar-row"><div class="bar-label sm">→ 2030</div><div class="bar-track"><div class="bar-fill bf-green" style="width:100%">$56.4B · CAGR 15.2%</div></div></div>
+      <div class="bar-row"><div class="bar-label sm">ME (KSA+UAE+EGY)</div><div class="bar-track"><div class="bar-fill bf-amber" style="width:45%">$3.14B · CAGR 13.8%</div></div></div>
+      <div class="bar-row"><div class="bar-label sm">Soccer segmento #1</div><div class="bar-track"><div class="bar-fill bf-teal" style="width:80%">Alineado con KSA 94%</div></div></div>
+      <div class="fnote">Fantasy sports no es el MVP pero valida que los fans ya consumen data de atletas en tiempo real — exactamente lo que Athletify produce.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAM SAM SOM -->
+<div class="page" id="page-tam">
+  <div class="tsm-grid">
+    <div class="tsm-box tam">
+      <div class="tsm-label">TAM — Total Addressable Market</div>
+      <div class="tsm-val">$9.4B</div>
+      <div class="tsm-name">Athlete analytics + scouting + performance data 2025</div>
+      <div class="tsm-desc">Sports analytics ($5.7B) + Scouting software ($1.5B) + AI scouting ($0.3B). Crece a $23B en 2033. Mercado exacto de Athletify.</div>
+      <span class="tsm-cagr">CAGR 18.5% · Grand View Research</span>
+    </div>
+    <div class="tsm-box sam">
+      <div class="tsm-label">SAM — Serviceable Addressable Market</div>
+      <div class="tsm-val">$830M</div>
+      <div class="tsm-name">Middle East & Africa + Latam 2025</div>
+      <div class="tsm-desc">ME&A ~$456M + Latam ~$342M. Mercados donde AWÁ ya opera. KSA sports market se triplica a $22.4B en 2030.</div>
+      <span class="tsm-cagr">ME crece +22% · Fortune BI</span>
+    </div>
+    <div class="tsm-box som">
+      <div class="tsm-label">SOM — Serviceable Obtainable Market</div>
+      <div class="tsm-val">$25M</div>
+      <div class="tsm-name">Objetivo Athletify año 1–3</div>
+      <div class="tsm-desc">3% del SAM. 500–1,000 organizaciones en UAE, KSA, España, Ecuador. ARR promedio $25K–$50K.</div>
+      <span class="tsm-cagr">3% SAM · benchmark B2B</span>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Composición del TAM $9.4B</div>
+      <div class="card-source">Grand View Research · MarketsandMarkets · DataIntelo · 2025</div>
+      <div class="bar-row"><div class="bar-label">Sports analytics</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:100%">$5.7B · GVR 2025</div></div></div>
+      <div class="bar-row"><div class="bar-label">Coaching platforms</div><div class="bar-track"><div class="bar-fill bf-amber" style="width:38%">$2.2B (porción B2B)</div></div></div>
+      <div class="bar-row"><div class="bar-label">Scouting software</div><div class="bar-track"><div class="bar-fill bf-green" style="width:26%">$1.5B · DataIntelo</div></div></div>
+      <div class="bar-row"><div class="bar-label">AI player scouting</div><div class="bar-track"><div class="bar-fill bf-purple" style="width:5%">$0.3B → $1.6B 2033</div></div></div>
+      <div class="fnote">TAM de $34B (sports tech general) incluye hardware, stadiums, broadcasting — no es el negocio de Athletify. $9.4B es el mercado exacto: software de performance data y scouting B2B.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Proyección TAM → SOM</div>
+      <div class="card-source">Grand View Research · Future Data Stats</div>
+      <div class="bar-row"><div class="bar-label">TAM 2025</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:41%">$9.4B</div></div></div>
+      <div class="bar-row"><div class="bar-label">TAM 2030</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:65%">~$14.8B</div></div></div>
+      <div class="bar-row"><div class="bar-label">TAM 2033</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:100%">$23B</div></div></div>
+      <div class="bar-row"><div class="bar-label">SAM 2025</div><div class="bar-track"><div class="bar-fill bf-green" style="width:9%">$830M</div></div></div>
+      <div class="bar-row"><div class="bar-label">SAM 2030</div><div class="bar-track"><div class="bar-fill bf-green" style="width:14%">~$1.4B</div></div></div>
+      <div class="bar-row"><div class="bar-label">SOM ≥3 años</div><div class="bar-track"><div class="bar-fill bf-purple" style="width:3%">$25M</div></div></div>
+    </div>
+  </div>
+  <div class="insight green"><strong>Narrativa para inversores:</strong> El deck muestra el ecosistema macro ($91.7B sponsorship, $27.8B fantasy sports) como contexto. Athletify aterriza en su mercado específico: $9.4B en athlete analytics + scouting, CAGR 18.5% hacia $23B en 2033, con SAM claro de $830M en mercados donde ya opera.</div>
+</div>
+
+<!-- ATHLETE DATA -->
+<div class="page" id="page-atletas">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Fans avid global</div><div class="kpi-val blue">21%</div><div class="kpi-sub">de todos los fans · Morning Consult</div></div>
+    <div class="kpi"><div class="kpi-label">KSA fans avid — #1 mundial</div><div class="kpi-val green">32%</div><div class="kpi-sub">mayor intensidad de fandom</div></div>
+    <div class="kpi"><div class="kpi-label">KSA + UAE avid 18–29</div><div class="kpi-val amber">37% / 33%</div><div class="kpi-sub">segmento joven más alto del mundo</div></div>
+    <div class="kpi"><div class="kpi-label">Soccer penetración KSA</div><div class="kpi-val coral">94%</div><div class="kpi-sub">deporte #1 en mercado de entrada</div></div>
+  </div>
+  <div class="insight blue"><strong>Relevancia para Athletify:</strong> Los datos propios de AWÁ Sports Tech (Morning Consult) confirman que los mercados de entrada — KSA y UAE — tienen los fans más intensos y jóvenes del mundo. El atleta de soccer emergente en ME es el usuario perfecto del MVP.</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Ranking fans avid por país (% que califica 10/10)</div>
+      <div class="card-source">Morning Consult · AWÁ Sports Tech Athlete Study</div>
+      <div class="bar-row"><span class="rank r1">1</span><div class="bar-label sm">Saudi Arabia 🇸🇦</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:100%">32%</div></div></div>
+      <div class="bar-row"><span class="rank r2">2</span><div class="bar-label sm">USA 🇺🇸</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:78%">25%</div></div></div>
+      <div class="bar-row"><span class="rank r3">3</span><div class="bar-label sm">India 🇮🇳</div><div class="bar-track"><div class="bar-fill bf-teal" style="width:72%">23%</div></div></div>
+      <div class="bar-row"><span class="rank rn">4</span><div class="bar-label sm">UAE 🇦🇪</div><div class="bar-track"><div class="bar-fill bf-teal" style="width:69%">22%</div></div></div>
+      <div class="bar-row"><span class="rank rn">5</span><div class="bar-label sm">Global 🌍</div><div class="bar-track"><div class="bar-fill bf-amber" style="width:66%">21%</div></div></div>
+      <div class="bar-row"><span class="rank rn">9</span><div class="bar-label sm">UK 🇬🇧</div><div class="bar-track"><div class="bar-fill bf-coral" style="width:56%">18%</div></div></div>
+      <div class="bar-row"><span class="rank rn">10</span><div class="bar-label sm">España 🇪🇸</div><div class="bar-track"><div class="bar-fill bf-purple" style="width:53%">17%</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Fans avid por edad — mercados clave Athletify</div>
+      <div class="card-source">Morning Consult · AWÁ Sports Tech Athlete Study</div>
+      <div class="age-group">
+        <div class="age-name">🇸🇦 Saudi Arabia <span class="tag tg-green">Target #1</span></div>
+        <div class="age-row"><div class="age-lbl">18–29</div><div class="age-track"><div class="age-fill af1" style="width:100%">37%</div></div></div>
+        <div class="age-row"><div class="age-lbl">30–44</div><div class="age-track"><div class="age-fill af1" style="width:95%">35%</div></div></div>
+        <div class="age-row"><div class="age-lbl">45–54</div><div class="age-track"><div class="age-fill af3" style="width:100%">40%</div></div></div>
+        <div class="age-row"><div class="age-lbl">55+</div><div class="age-track"><div class="age-fill af4" style="width:14%">5%</div></div></div>
+      </div>
+      <div class="age-group">
+        <div class="age-name">🇦🇪 UAE <span class="tag tg-green">Target #2</span></div>
+        <div class="age-row"><div class="age-lbl">18–29</div><div class="age-track"><div class="age-fill af2" style="width:89%">33%</div></div></div>
+        <div class="age-row"><div class="age-lbl">30–44</div><div class="age-track"><div class="age-fill af2" style="width:78%">29%</div></div></div>
+        <div class="age-row"><div class="age-lbl">45–54</div><div class="age-track"><div class="age-fill af4" style="width:27%">10%</div></div></div>
+        <div class="age-row"><div class="age-lbl">55+</div><div class="age-track"><div class="age-fill af4" style="width:11%">4%</div></div></div>
+      </div>
+      <div class="age-group">
+        <div class="age-name">🇪🇸 España <span class="tag tg-amber">Target #3</span></div>
+        <div class="age-row"><div class="age-lbl">18–29</div><div class="age-track"><div class="age-fill af3" style="width:73%">27%</div></div></div>
+        <div class="age-row"><div class="age-lbl">30–44</div><div class="age-track"><div class="age-fill af3" style="width:54%">20%</div></div></div>
+        <div class="age-row"><div class="age-lbl">45–54</div><div class="age-track"><div class="age-fill af4" style="width:38%">14%</div></div></div>
+        <div class="age-row"><div class="age-lbl">55+</div><div class="age-track"><div class="age-fill af4" style="width:30%">11%</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Popularidad de deportes por mercado</div>
+    <div class="card-source">Morning Consult · AWÁ Sports Tech Athlete Study Data</div>
+    <table class="ht">
+      <tr><th>Mercado</th><th>Soccer</th><th>Basketball</th><th>F1</th><th>Tennis</th><th>Cricket</th><th>Olympics</th><th>Top sport</th></tr>
+      <tr><td>Saudi Arabia 🇸🇦</td><td><span class="hh">94%</span></td><td>34%</td><td>24%</td><td>13%</td><td>4%</td><td>13%</td><td>⚽ Soccer</td></tr>
+      <tr><td>UAE 🇦🇪</td><td><span class="hh">79%</span></td><td><span class="hm">56%</span></td><td>19%</td><td>20%</td><td>19%</td><td>17%</td><td>⚽🏀</td></tr>
+      <tr><td>India 🇮🇳</td><td>61%</td><td>20%</td><td>22%</td><td>33%</td><td><span class="hh">91%</span></td><td>32%</td><td>🏏 Cricket</td></tr>
+      <tr><td>España 🇪🇸</td><td><span class="hh">86%</span></td><td>17%</td><td><span class="hm">49%</span></td><td><span class="hm">51%</span></td><td>0%</td><td>45%</td><td>⚽ Soccer</td></tr>
+      <tr><td>UK 🇬🇧</td><td><span class="hh">84%</span></td><td>10%</td><td><span class="hm">32%</span></td><td>39%</td><td>28%</td><td>44%</td><td>⚽ Soccer</td></tr>
+      <tr><td>USA 🇺🇸</td><td>20%</td><td><span class="hh">60%</span></td><td>10%</td><td>16%</td><td>2%</td><td><span class="hm">41%</span></td><td>🏀 Basketball</td></tr>
+      <tr><td>Global 🌍</td><td>64%</td><td>32%</td><td>26%</td><td>32%</td><td>16%</td><td>38%</td><td>⚽ Soccer</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- WHY NOW -->
+<div class="page" id="page-why">
+  <div class="why-grid">
+    <div class="why-card"><div class="why-num" style="color:var(--blue-mid)">$189B</div><div class="why-title">Récord global de AI funding — Feb 2026</div><div class="why-body">Capital concentrado en sistemas AI verticales. Sports tech es uno de los sectores más activos. El mercado está listo para soluciones como Athletify.</div></div>
+    <div class="why-card"><div class="why-num" style="color:var(--green-mid)">$22.4B</div><div class="why-title">KSA sports market en 2030 — se triplica</div><div class="why-body">Saudi Arabia Vision 2030 + FIFA World Cup 2034 + $65B invertidos en GCC (dic 2024). El mercado de entrada de Athletify en su mayor crecimiento histórico.</div></div>
+    <div class="why-card"><div class="why-num" style="color:var(--amber-mid)">$2.3B</div><div class="why-title">NIL economy — atletas como activos financieros</div><div class="why-body">House Settlement 2025: $20.5M por escuela. Tech brands +29% YoY en NIL. La economía del atleta se profesionaliza — Athletify llega en el momento exacto.</div></div>
+    <div class="why-card"><div class="why-num" style="color:#c0392b">78%</div><div class="why-title">Equipos profesionales ya usan AI analytics</div><div class="why-body">Pero el mercado emergente en ME y Latam aún no tiene acceso. Athletify democratiza analytics de performance para atletas invisibles al ecosistema actual.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Señales que validan el timing</div>
+    <div class="card-source">AWÁ Athlete Study · PwC ME · SponsorUnited · Abril 2026</div>
+    <div class="bar-row"><div class="bar-label">KSA fans avid 18–29</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:100%">37% — #1 del mundo · AWÁ Study</div></div></div>
+    <div class="bar-row"><div class="bar-label">ME consumidores digitales</div><div class="bar-track"><div class="bar-fill bf-green" style="width:90%">67% vs 51% global · PwC</div></div></div>
+    <div class="bar-row"><div class="bar-label">AI scouting CAGR</div><div class="bar-track"><div class="bar-fill bf-purple" style="width:100%">23.4% — más rápido del sector</div></div></div>
+    <div class="bar-row"><div class="bar-label">Soccer KSA</div><div class="bar-track"><div class="bar-fill bf-amber" style="width:100%">94% — mayor del mundo · AWÁ Study</div></div></div>
+    <div class="bar-row"><div class="bar-label">GCC sports investment</div><div class="bar-track"><div class="bar-fill bf-teal" style="width:90%">$65B+ invertidos dic 2024</div></div></div>
+    <div class="bar-row"><div class="bar-label">Fantasy sports ME 2025</div><div class="bar-track"><div class="bar-fill bf-coral" style="width:85%">$3.14B · CAGR 13.8%</div></div></div>
+  </div>
+</div>
+
+<!-- TRACCIÓN -->
+<div class="page" id="page-traction">
+  <div class="insight green"><strong>Athletify no parte de cero.</strong> Nace sobre AWÁ Nutrition — operación real con ingresos, atletas y presencia en el ecosistema deportivo. Eso lo diferencia de una startup construyendo desde afuera.</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Tracción de AWÁ como base</div>
+      <div class="card-source">AWÁ Sports Tech</div>
+      <div class="tr-row"><div class="tr-val" style="color:var(--blue-mid)">$1M+</div><div class="tr-desc">Ingresos generados por AWÁ Nutrition. Marca con ventas reales, no una startup sin revenue.</div></div>
+      <div class="tr-row"><div class="tr-val" style="color:var(--green-mid)">Activa</div><div class="tr-desc">Relación directa con atletas en la región. Canal de adquisición de usuarios ya construido.</div></div>
+      <div class="tr-row"><div class="tr-val" style="color:var(--amber-mid)">Real</div><div class="tr-desc">Experiencia directa en performance deportiva. El problema se entiende desde adentro.</div></div>
+      <div class="tr-row"><div class="tr-val" style="color:#c0392b">ME+Latam</div><div class="tr-desc">Presencia operativa en los dos mercados del SAM. No es expansión — ya están ahí.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Benchmark — startups comparables</div>
+      <div class="card-source">Casos reales 2024–2025</div>
+      <div class="bar-row"><div class="bar-label">Gemini Sports Analytics</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:62%">$3.1M Series A 2024</div></div></div>
+      <div class="bar-row"><div class="bar-label">KhiladiPro (India)</div><div class="bar-track"><div class="bar-fill bf-green" style="width:20%">$1M seed jun 2025</div></div></div>
+      <div class="bar-row"><div class="bar-label">OTTO Sport AI</div><div class="bar-track"><div class="bar-fill bf-purple" style="width:66%">$16.5M seed 2026</div></div></div>
+      <div class="bar-row"><div class="bar-label">Arkero</div><div class="bar-track"><div class="bar-fill bf-amber" style="width:24%">$6M 2026</div></div></div>
+      <div class="bar-row"><div class="bar-label">Athletify pre-seed</div><div class="bar-track"><div class="bar-fill bf-teal" style="width:12%">$600K · 50% ✓</div></div></div>
+      <div class="fnote">KhiladiPro es el más comparable: AI para atletas jóvenes en mercado emergente. Athletify tiene ventaja: tracción real de AWÁ Nutrition ya existente.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ROADMAP -->
+<div class="page" id="page-roadmap">
+  <div class="insight blue"><strong>Estrategia por capas.</strong> Athletify entra por el wedge de performance data y visibilidad. Escala hacia capas de mayor monetización a medida que construye el data layer.</div>
+  <div class="layer l1"><div class="ll"><span class="lsub">CAPA 1 · MVP · Ahora</span><span>Performance Data & Visibilidad</span></div><div class="lb"><div class="lv">TAM $5.7B · SAM $456M</div><div class="ld">Perfiles verificables · reportes de rendimiento · B2B con academias, clubes, federaciones · soccer primero</div></div></div>
+  <div class="layer l2"><div class="ll"><span class="lsub">CAPA 2 · 12–24 meses</span><span>Scouting & Talent ID</span></div><div class="lb"><div class="lv">TAM $1.5B · SAM $120M</div><div class="ld">Marketplace de talento verificado · clubes pro, scouts, agentes · 700–1K agentes en España como early adopters</div></div></div>
+  <div class="layer l3"><div class="ll"><span class="lsub">CAPA 3 · 24–48 meses</span><span>Athlete Economy & NIL</span></div><div class="lb"><div class="lv">NIL $2.3B · Tech sponsors $543M</div><div class="ld">Matching marcas con atletas · NIL deals automatizados · comisión por transacción</div></div></div>
+  <div class="layer l4"><div class="ll"><span class="lsub">CAPA 4 · Largo plazo</span><span>Financiamiento Descentralizado</span></div><div class="lb"><div class="lv">Nuevo mercado · "Modelo 4"</div><div class="ld">Fans financian atletas directamente · $19–20B en NCAA sin modelo descentralizado</div></div></div>
+  <div class="grid-2" style="margin-top:16px">
+    <div class="card">
+      <div class="card-title">Mercados por prioridad</div>
+      <div class="card-source">AWÁ Athlete Study + inversión deportiva</div>
+      <div class="bar-row"><div class="bar-label">UAE + KSA 🇦🇪🇸🇦</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:100%">Entrada · 32% avid fans KSA</div></div></div>
+      <div class="bar-row"><div class="bar-label">España 🇪🇸</div><div class="bar-track"><div class="bar-fill bf-green" style="width:75%">700–1K agentes · soccer 86%</div></div></div>
+      <div class="bar-row"><div class="bar-label">Ecuador + Panamá 🇪🇨</div><div class="bar-track"><div class="bar-fill bf-amber" style="width:40%">Piloto · mercado de origen</div></div></div>
+      <div class="bar-row"><div class="bar-label">India 🇮🇳</div><div class="bar-track"><div class="bar-fill bf-purple" style="width:30%">Cricket 91% · expansión futura</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Modelo de monetización por capa</div>
+      <div class="card-source">Benchmarks B2B SaaS deportivo</div>
+      <div class="bar-row"><div class="bar-label">Capa 1 — SaaS</div><div class="bar-track"><div class="bar-fill bf-blue" style="width:100%">$5K–$80K ARR por org</div></div></div>
+      <div class="bar-row"><div class="bar-label">Capa 2 — Marketplace</div><div class="bar-track"><div class="bar-fill bf-green" style="width:75%">15–30% take rate por deal</div></div></div>
+      <div class="bar-row"><div class="bar-label">Capa 3 — NIL</div><div class="bar-track"><div class="bar-fill bf-purple" style="width:60%">Comisión por transacción</div></div></div>
+      <div class="bar-row"><div class="bar-label">Capa 4 — Financiamiento</div><div class="bar-track"><div class="bar-fill bf-amber" style="width:45%">Fee de plataforma</div></div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
